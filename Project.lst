@@ -1,12 +1,14 @@
-Microsoft (R) Macro Assembler Version 14.10.25019.0	    09/16/17 21:48:27
-#Program Template     (template.asm			     Page 1 - 1
+Microsoft (R) Macro Assembler Version 14.10.25019.0	    10/23/17 19:17:08
+4Sum of Negative Numbers     (EmmetCookeProgram3.asm	     Page 1 - 1
 
 
-				TITLE Program Template     (template.asm)
+				TITLE Sum of Negative Numbers     (EmmetCookeProgram3.asm)
 
-				; Author:
-				; Course / Project ID                 Date:
-				; Description:
+				; Author: Emmet Cooke	
+				; Course / Project ID : cs271 / Program 3         Date: 10/23/2017
+				; Description: This program asks the users for a series of negative numbers between
+				; -100 and -1. It will continue to prompt them for numbers until they enter a non-negative
+				; number. Then it will display the sum and average of the entered numbers.
 
 				INCLUDE Irvine32.inc
 			      C ; Include file for Irvine32.lib             (Irvine32.inc)
@@ -30,24 +32,219 @@ Microsoft (R) Macro Assembler Version 14.10.25019.0	    09/16/17 21:48:27
 				; (insert constant definitions here)
 
  00000000			.data
+					; Strings to display the programmers name and the program title
+ 00000000 50 72 6F 67 72		programTitle		BYTE	"Program: Sum of Negative Numbers",0
+	   61 6D 3A 20 53
+	   75 6D 20 6F 66
+	   20 4E 65 67 61
+	   74 69 76 65 20
+	   4E 75 6D 62 65
+	   72 73 00
+ 00000021 41 75 74 68 6F		programmerName		BYTE	"Author : Emmet Cooke",0
+	   72 20 3A 20 45
+	   6D 6D 65 74 20
+	   43 6F 6F 6B 65
+	   00
 
-				; (insert variable definitions here)
+					; Variables to get the users name, store the input, and greet them
+ 00000036 57 68 61 74 27		namePrompt			BYTE	"What's your name? ",0
+	   73 20 79 6F 75
+	   72 20 6E 61 6D
+	   65 3F 20 00
+ 00000049  00000015 [			userName			BYTE	21 DUP(0)
+	    00
+	   ]
+ 0000005E 00000000			userNameSize		DWORD	?
+ 00000062 48 65 6C 6C 6F		greeting			BYTE	"Hello, ",0
+	   2C 20 00
+
+					; Strings to instruct the user
+ 0000006A 54 68 69 73 20		instruction			BYTE	"This program will average a sum of numbers between -100 and -1.", 0ah
+	   70 72 6F 67 72
+	   61 6D 20 77 69
+	   6C 6C 20 61 76
+	   65 72 61 67 65
+	   20 61 20 73 75
+	   6D 20 6F 66 20
+	   6E 75 6D 62 65
+	   72 73 20 62 65
+	   74 77 65 65 6E
+	   20 2D 31 30 30
+	   20 61 6E 64 20
+	   2D 31 2E 0A
+ 000000AA  49 74 20 77 69							BYTE	"It will continue to ask you to enter a number in this range",0ah
+	   6C 6C 20 63 6F
+	   6E 74 69 6E 75
+	   65 20 74 6F 20
+	   61 73 6B 20 79
+	   6F 75 20 74 6F
+	   20 65 6E 74 65
+	   72 20 61 20 6E
+	   75 6D 62 65 72
+	   20 69 6E 20 74
+	   68 69 73 20 72
+	   61 6E 67 65 0A
+ 000000E6  75 6E 74 69 6C							BYTE	"until a non-negative number is entered.", 0ah
+	   20 61 20 6E 6F
+	   6E 2D 6E 65 67
+	   61 74 69 76 65
+	   20 6E 75 6D 62
+	   65 72 20 69 73
+	   20 65 6E 74 65
+	   72 65 64 2E 0A
+ 0000010E  54 68 65 6E 2C							BYTE	"Then, it will output the sum and average of those values.",0
+	   20 69 74 20 77
+	   69 6C 6C 20 6F
+	   75 74 70 75 74
+	   20 74 68 65 20
+	   73 75 6D 20 61
+	   6E 64 20 61 76
+	   65 72 61 67 65
+	   20 6F 66 20 74
+	   68 6F 73 65 20
+	   76 61 6C 75 65
+	   73 2E 00
+ 00000148 50 6C 65 61 73		negativeNumPrompt	BYTE	"Please enter a number between -100 and -1 (0 or above to quit): ",0
+	   65 20 65 6E 74
+	   65 72 20 61 20
+	   6E 75 6D 62 65
+	   72 20 62 65 74
+	   77 65 65 6E 20
+	   2D 31 30 30 20
+	   61 6E 64 20 2D
+	   31 20 28 30 20
+	   6F 72 20 61 62
+	   6F 76 65 20 74
+	   6F 20 71 75 69
+	   74 29 3A 20 00
+ 00000189 54 68 61 74 20		belowNeg100Warn		BYTE	"That is below -100. ",0
+	   69 73 20 62 65
+	   6C 6F 77 20 2D
+	   31 30 30 2E 20
+	   00
+
+					; Variables to hold the values input by the user
+ 0000019E 00000000			inputValue			DWORD	?
+ 000001A2 00000000			negativeSum			DWORD	0
+ 000001A6 00000000			negativeAverage		DWORD	?
 
  00000000			.code
  00000000			main PROC
+					; Introduce the Programmer
+ 00000000  E8 0000007F			call	introduceProgrammer	; Goes to the introduceProgrammer procedure
 
-				; (insert executable instructions here)
+					; Gets the users name and greets them
+ 00000005  E8 0000009B			call	getName				; Goes to the getName procedure
+ 0000000A  E8 00000000 E		call	Crlf
+ 0000000F  BA 00000062 R		mov		edx, OFFSET greeting
+ 00000014  E8 00000000 E		call	WriteString
+ 00000019  BA 00000049 R		mov		edx, OFFSET userName
+ 0000001E  E8 00000000 E		call	WriteString
+ 00000023  E8 00000000 E		call	Crlf
 
+					; Instruct the user on how to use the program
+ 00000028  BA 0000006A R		mov		edx, OFFSET instruction
+ 0000002D  E8 00000000 E		call	WriteString
+ 00000032  E8 00000000 E		call	Crlf
+
+					; Get a number between -100 and -1 from the user
+ 00000037			negNumLoop:
+					; Prompts the user for a value
+ 00000037  BA 00000148 R		mov		edx, OFFSET negativeNumPrompt
+ 0000003C  E8 00000000 E		call	WriteString
+ 00000041  E8 00000000 E		call	ReadInt
+
+					; Checks the value of the input int
+ 00000046  A3 0000019E R		mov		inputValue, eax
+ 0000004B  83 3D 0000019E R		cmp		inputValue, 0		; non-negative has been entered
+	   00
+ 00000052  7D 29			jge		loopEnd
+
+					; Check if the value is within range
+ 00000054  83 3D 0000019E R		cmp		inputValue, -100
+	   9C
+ 0000005B  73 02			jae		valueInRange
+ 0000005D  EB 0D			jmp		belowNegative100
+
+ 0000005F			valueInRange:
+ 0000005F  A1 0000019E R		mov		eax, inputValue
+ 00000064  01 05 000001A2 R		add		negativeSum, eax
+ 0000006A  EB CB			jmp		negNumLoop
+
+ 0000006C			belowNegative100:
+ 0000006C  BA 00000189 R		mov		edx, OFFSET belowNeg100Warn
+ 00000071  E8 00000000 E		call	WriteString
+ 00000076  E8 00000000 E		call	Crlf
+ 0000007B  EB BA			jmp		negNumLoop
+
+ 0000007D			loopEnd:
 					exit	; exit to operating system
- 00000000  6A 00	   *	    push   +000000000h
- 00000002  E8 00000000 E   *	    call   ExitProcess
- 00000007			main ENDP
+ 0000007D  6A 00	   *	    push   +000000000h
+ 0000007F  E8 00000000 E   *	    call   ExitProcess
+ 00000084			main ENDP
 
-				; (insert additional procedures here)
+				;-------------------------------------
+				; Procedure to introduce the programmer
+				; recieves: none
+				; returns: none
+				; preconditions: none
+				; registers changed: edx
+				;-------------------------------------
+ 00000084			introduceProgrammer PROC USES edx
+ 00000084  52		   *	    push   edx
+ 00000085  BA 00000000 R		mov		edx, OFFSET programTitle
+ 0000008A  E8 00000000 E		call	WriteString
+ 0000008F  E8 00000000 E		call	Crlf
+ 00000094  BA 00000021 R		mov		edx, OFFSET programmerName
+ 00000099  E8 00000000 E		call	WriteString
+ 0000009E  E8 00000000 E		call	Crlf
+					ret
+ 000000A3  5A		   *	    pop    edx
+ 000000A4  C3		   *	    ret    00000h
+ 000000A5			introduceProgrammer ENDP
+
+				;-------------------------------------
+				; Procedure to get the users name
+				; recieves: none
+				; returns: user input for the global variable userName
+				; preconditions: none
+				; registers changed: eax, ecx, edx
+				;-------------------------------------
+ 000000A5			getName PROC USES eax ecx edx
+ 000000A5  50		   *	    push   eax
+ 000000A6  51		   *	    push   ecx
+ 000000A7  52		   *	    push   edx
+ 000000A8  BA 00000036 R		mov		edx, OFFSET namePrompt
+ 000000AD  E8 00000000 E		call	WriteString
+ 000000B2  BA 00000049 R		mov		edx, OFFSET userName
+ 000000B7  B9 00000015			mov		ecx, SIZEOF	userName
+ 000000BC  E8 00000000 E		call	ReadString
+ 000000C1  A3 0000005E R		mov		userNameSize, eax
+					ret
+ 000000C6  5A		   *	    pop    edx
+ 000000C7  59		   *	    pop    ecx
+ 000000C8  58		   *	    pop    eax
+ 000000C9  C3		   *	    ret    00000h
+ 000000CA			getName ENDP
+
+				;-------------------------------------
+				; Procedure to display warning about being
+				; below -100
+				; recieves: none
+				; returns: none
+				; precondition: user entered value below -100
+				; registers changed: edx
+				;-------------------------------------
+				;belowNegative100 PROC USES edx
+					;mov		edx, OFFSET belowNeg100Warn
+					;call	WriteString
+					;call	Crlf
+					;ret
+				;belowNegative100 ENDP
 
 				END main
-Microsoft (R) Macro Assembler Version 14.10.25019.0	    09/16/17 21:48:27
-#Program Template     (template.asm			     Symbols 2 - 1
+Microsoft (R) Macro Assembler Version 14.10.25019.0	    10/23/17 19:17:08
+4Sum of Negative Numbers     (EmmetCookeProgram3.asm	     Symbols 2 - 1
 
 
 
@@ -140,8 +337,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00000000 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000007 Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 000001AA Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 000000CA Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -248,7 +445,13 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000007 Public STDCALL
+getName  . . . . . . . . . . . .	P Near	 000000A5 _TEXT	Length= 00000025 Public STDCALL
+introduceProgrammer  . . . . . .	P Near	 00000084 _TEXT	Length= 00000021 Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000084 Public STDCALL
+  negNumLoop . . . . . . . . . .	L Near	 00000037 _TEXT	
+  valueInRange . . . . . . . . .	L Near	 0000005F _TEXT	
+  belowNegative100 . . . . . . .	L Near	 0000006C _TEXT	
+  loopEnd  . . . . . . . . . . .	L Near	 0000007D _TEXT	
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
@@ -467,6 +670,7 @@ VK_UP  . . . . . . . . . . . . .	Number	 00000026h
 WINDOW_BUFFER_SIZE_EVENT . . . .	Number	 00000004h   
 WriteConsoleOutputCharacter  . .	Text   	 WriteConsoleOutputCharacterA
 WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
+belowNeg100Warn  . . . . . . . .	Byte	 00000189 _DATA	
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
@@ -474,6 +678,9 @@ cyan . . . . . . . . . . . . . .	Number	 00000003h
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
+greeting . . . . . . . . . . . .	Byte	 00000062 _DATA	
+inputValue . . . . . . . . . . .	DWord	 0000019E _DATA	
+instruction  . . . . . . . . . .	Byte	 0000006A _DATA	
 lightBlue  . . . . . . . . . . .	Number	 00000009h   
 lightCyan  . . . . . . . . . . .	Number	 0000000Bh   
 lightGray  . . . . . . . . . . .	Number	 00000007h   
@@ -481,7 +688,15 @@ lightGreen . . . . . . . . . . .	Number	 0000000Ah
 lightMagenta . . . . . . . . . .	Number	 0000000Dh   
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
 magenta  . . . . . . . . . . . .	Number	 00000005h   
+namePrompt . . . . . . . . . . .	Byte	 00000036 _DATA	
+negativeAverage  . . . . . . . .	DWord	 000001A6 _DATA	
+negativeNumPrompt  . . . . . . .	Byte	 00000148 _DATA	
+negativeSum  . . . . . . . . . .	DWord	 000001A2 _DATA	
+programTitle . . . . . . . . . .	Byte	 00000000 _DATA	
+programmerName . . . . . . . . .	Byte	 00000021 _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
+userNameSize . . . . . . . . . .	DWord	 0000005E _DATA	
+userName . . . . . . . . . . . .	Byte	 00000049 _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   

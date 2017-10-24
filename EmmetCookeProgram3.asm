@@ -21,6 +21,19 @@ INCLUDE Irvine32.inc
 	userNameSize		DWORD	?
 	greeting			BYTE	"Hello, ",0
 
+	; Strings to instruct the user
+	instruction			BYTE	"This program will average a sum of numbers between -100 and -1.", 0ah
+						BYTE	"It will continue to ask you to enter a number in this range",0ah
+						BYTE	"until a non-negative number is entered.", 0ah
+						BYTE	"Then, it will output the sum and average of those values.",0
+	negativeNumPrompt	BYTE	"Please enter a number between -100 and -1 (0 or above to quit): ",0
+	belowNeg100Warn		BYTE	"That is below -100. ",0
+
+	; Variables to hold the values input by the user
+	inputValue			DWORD	?
+	negativeSum			DWORD	0
+	negativeAverage		DWORD	?
+
 .code
 main PROC
 	; Introduce the Programmer
@@ -35,7 +48,42 @@ main PROC
 	call	WriteString
 	call	Crlf
 
+	; Instruct the user on how to use the program
+	mov		edx, OFFSET instruction
+	call	WriteString
+	call	Crlf
 
+	; Get a number between -100 and -1 from the user
+negNumLoop:
+	; Prompts the user for a value
+	mov		edx, OFFSET negativeNumPrompt
+	call	WriteString
+	call	ReadInt
+
+	; Checks the value of the input int
+	mov		inputValue, eax
+	cmp		inputValue, 0		; non-negative has been entered
+	jge		loopEnd
+
+	; Check if the value is within range
+	cmp		inputValue, -100
+	jae		valueInRange
+	jmp		belowNegative100
+
+	; The value is within range and it is added to the sum
+valueInRange:
+	mov		eax, inputValue
+	add		negativeSum, eax
+	jmp		negNumLoop
+
+	; The value is below -100
+belowNegative100:
+	mov		edx, OFFSET belowNeg100Warn
+	call	WriteString
+	call	Crlf
+	jmp		negNumLoop
+
+loopEnd:
 	exit	; exit to operating system
 main ENDP
 
@@ -63,7 +111,7 @@ introduceProgrammer ENDP
 ; preconditions: none
 ; registers changed: eax, ecx, edx
 ;-------------------------------------
-getName PROC USES eax, ecx, edx
+getName PROC USES eax ecx edx
 	mov		edx, OFFSET namePrompt
 	call	WriteString
 	mov		edx, OFFSET userName
@@ -72,5 +120,6 @@ getName PROC USES eax, ecx, edx
 	mov		userNameSize, eax
 	ret
 getName ENDP
+
 
 END main

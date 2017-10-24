@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 14.10.25019.0	    10/24/17 14:30:16
+Microsoft (R) Macro Assembler Version 14.10.25019.0	    10/24/17 16:58:59
 4Sum of Negative Numbers     (EmmetCookeProgram3.asm	     Page 1 - 1
 
 
@@ -9,6 +9,7 @@ Microsoft (R) Macro Assembler Version 14.10.25019.0	    10/24/17 14:30:16
 				; Description: This program asks the users for a series of negative numbers between
 				; -100 and -1. It will continue to prompt them for numbers until they enter a non-negative
 				; number. Then it will display the sum and average of the entered numbers.
+				; EC #1: This program displays a number as the user enters them
 
 				INCLUDE Irvine32.inc
 			      C ; Include file for Irvine32.lib             (Irvine32.inc)
@@ -46,21 +47,32 @@ Microsoft (R) Macro Assembler Version 14.10.25019.0	    10/24/17 14:30:16
 	   6D 6D 65 74 20
 	   43 6F 6F 6B 65
 	   00
+ 00000036 45 43 23 31 3A		extraCredit1		BYTE	"EC#1: This program numbers the lines during input.",0
+	   20 54 68 69 73
+	   20 70 72 6F 67
+	   72 61 6D 20 6E
+	   75 6D 62 65 72
+	   73 20 74 68 65
+	   20 6C 69 6E 65
+	   73 20 64 75 72
+	   69 6E 67 20 69
+	   6E 70 75 74 2E
+	   00
 
 					; Variables to get the users name, store the input, and greet them
- 00000036 57 68 61 74 27		namePrompt			BYTE	"What's your name? ",0
+ 00000069 57 68 61 74 27		namePrompt			BYTE	"What's your name? ",0
 	   73 20 79 6F 75
 	   72 20 6E 61 6D
 	   65 3F 20 00
- 00000049  00000015 [			userName			BYTE	21 DUP(0)
+ 0000007C  00000015 [			userName			BYTE	21 DUP(0)
 	    00
 	   ]
- 0000005E 00000000			userNameSize		DWORD	?
- 00000062 48 65 6C 6C 6F		greeting			BYTE	"Hello, ",0
+ 00000091 00000000			userNameSize		DWORD	?
+ 00000095 48 65 6C 6C 6F		greeting			BYTE	"Hello, ",0
 	   2C 20 00
 
 					; Strings to instruct the user
- 0000006A 54 68 69 73 20		instruction			BYTE	"This program will average a sum of numbers between -100 and -1.", 0ah
+ 0000009D 54 68 69 73 20		instruction			BYTE	"This program will average a sum of numbers between -100 and -1.", 0ah
 	   70 72 6F 67 72
 	   61 6D 20 77 69
 	   6C 6C 20 61 76
@@ -73,7 +85,7 @@ Microsoft (R) Macro Assembler Version 14.10.25019.0	    10/24/17 14:30:16
 	   20 2D 31 30 30
 	   20 61 6E 64 20
 	   2D 31 2E 0A
- 000000AA  49 74 20 77 69							BYTE	"It will continue to ask you to enter a number in this range",0ah
+ 000000DD  49 74 20 77 69							BYTE	"It will continue to ask you to enter a number in this range",0ah
 	   6C 6C 20 63 6F
 	   6E 74 69 6E 75
 	   65 20 74 6F 20
@@ -85,7 +97,7 @@ Microsoft (R) Macro Assembler Version 14.10.25019.0	    10/24/17 14:30:16
 	   20 69 6E 20 74
 	   68 69 73 20 72
 	   61 6E 67 65 0A
- 000000E6  75 6E 74 69 6C							BYTE	"until a non-negative number is entered.", 0ah
+ 00000119  75 6E 74 69 6C							BYTE	"until a non-negative number is entered.", 0ah
 	   20 61 20 6E 6F
 	   6E 2D 6E 65 67
 	   61 74 69 76 65
@@ -93,7 +105,7 @@ Microsoft (R) Macro Assembler Version 14.10.25019.0	    10/24/17 14:30:16
 	   65 72 20 69 73
 	   20 65 6E 74 65
 	   72 65 64 2E 0A
- 0000010E  54 68 65 6E 2C							BYTE	"Then, it will output the sum and average of those values.",0
+ 00000141  54 68 65 6E 2C							BYTE	"Then, it will output the sum and average of those values.",0
 	   20 69 74 20 77
 	   69 6C 6C 20 6F
 	   75 74 70 75 74
@@ -105,7 +117,7 @@ Microsoft (R) Macro Assembler Version 14.10.25019.0	    10/24/17 14:30:16
 	   68 6F 73 65 20
 	   76 61 6C 75 65
 	   73 2E 00
- 00000148 50 6C 65 61 73		negativeNumPrompt	BYTE	"Please enter a number between -100 and -1 (0 or above to quit): ",0
+ 0000017B 50 6C 65 61 73		negativeNumPrompt	BYTE	"Please enter a number between -100 and -1. Enter 0 or greater to quit. ",0
 	   65 20 65 6E 74
 	   65 72 20 61 20
 	   6E 75 6D 62 65
@@ -113,114 +125,147 @@ Microsoft (R) Macro Assembler Version 14.10.25019.0	    10/24/17 14:30:16
 	   77 65 65 6E 20
 	   2D 31 30 30 20
 	   61 6E 64 20 2D
-	   31 20 28 30 20
-	   6F 72 20 61 62
-	   6F 76 65 20 74
-	   6F 20 71 75 69
-	   74 29 3A 20 00
- 00000189 54 68 61 74 20		belowNeg100Warn		BYTE	"That is below -100. ",0
+	   31 2E 20 45 6E
+	   74 65 72 20 30
+	   20 6F 72 20 67
+	   72 65 61 74 65
+	   72 20 74 6F 20
+	   71 75 69 74 2E
+	   20 00
+ 000001C3 54 68 61 74 20		belowNeg100Warn		BYTE	"That is below -100. ",0
 	   69 73 20 62 65
 	   6C 6F 77 20 2D
 	   31 30 30 2E 20
 	   00
+ 000001D8 4E 75 6D 62 65		numberString		BYTE	"Number ",0
+	   72 20 00
+ 000001E0 3A 20 00			colon				BYTE	": ",0
 
 					; Variables to hold the values input by the user
- 0000019E 00000000			inputValue			DWORD	?
- 000001A2 00000000			negativeSum			DWORD	0
- 000001A6 00000000			negativeAverage		DWORD	0
- 000001AA 00000000			numEntries			DWORD	0
+ 000001E3 00000000			inputValue			DWORD	?
+ 000001E7 00000000			negativeSum			DWORD	0
+ 000001EB 00000001			numEntries			DWORD	1
 
 					; Strings to display the results
- 000001AE 53 75 6D 3A 20		sum					BYTE	"Sum: ",0
+ 000001EF 59 6F 75 20 65		output0				BYTE	"You entered no numbers.",0
+	   6E 74 65 72 65
+	   64 20 6E 6F 20
+	   6E 75 6D 62 65
+	   72 73 2E 00
+ 00000207 59 6F 75 20 65		output1				BYTE	"You entered ",0
+	   6E 74 65 72 65
+	   64 20 00
+ 00000214 20 6E 75 6D 62		output2				BYTE	" numbers.",0
+	   65 72 73 2E 00
+ 0000021E 53 75 6D 3A 20		sum					BYTE	"Sum: ",0
 	   00
- 000001B4 41 76 65 72 61		average				BYTE	"Average: ",0
+ 00000224 41 76 65 72 61		average				BYTE	"Average: ",0
 	   67 65 3A 20 00
- 000001BE 2D 00				negativeSign		BYTE	"-",0
+ 0000022E 2D 00				negativeSign		BYTE	"-",0
+
+					; Goodbye message
+ 00000230 54 68 61 6E 6B		thanksMessage		BYTE	"Thanks for using this program, ",0
+	   73 20 66 6F 72
+	   20 75 73 69 6E
+	   67 20 74 68 69
+	   73 20 70 72 6F
+	   67 72 61 6D 2C
+	   20 00
+ 00000250 2E 20 47 6F 6F		goodbye				BYTE	". Goodbye!",0
+	   64 62 79 65 21
+	   00
 
  00000000			.code
  00000000			main PROC
 					; Introduce the Programmer
- 00000000  E8 000000DC			call	introduceProgrammer	; Goes to the introduceProgrammer procedure
+ 00000000  E8 000000DE			call	introduceProgrammer	
+ 00000005  BA 00000036 R		mov		edx, OFFSET extraCredit1
+ 0000000A  E8 00000000 E		call	WriteString
+ 0000000F  E8 00000000 E		call	Crlf
+ 00000014  E8 00000000 E		call	Crlf
 
 					; Gets the users name and greets them
- 00000005  E8 000000F8			call	getName				; Goes to the getName procedure
- 0000000A  E8 00000000 E		call	Crlf
- 0000000F  BA 00000062 R		mov		edx, OFFSET greeting
- 00000014  E8 00000000 E		call	WriteString
- 00000019  BA 00000049 R		mov		edx, OFFSET userName
- 0000001E  E8 00000000 E		call	WriteString
- 00000023  E8 00000000 E		call	Crlf
- 00000028  E8 00000000 E		call	Crlf
+ 00000019  E8 000000E6			call	getName				
+ 0000001E  E8 0000010B			call	greetUser			
 
 					; Instruct the user on how to use the program
- 0000002D  BA 0000006A R		mov		edx, OFFSET instruction
- 00000032  E8 00000000 E		call	WriteString
- 00000037  E8 00000000 E		call	Crlf
+ 00000023  E8 00000127			call	instructUser
+ 00000028  E8 00000000 E		call	Crlf
 
 					; Get a number between -100 and -1 from the user
- 0000003C			negNumLoop:
+ 0000002D			negNumLoop:
 					; Prompts the user for a value
- 0000003C  BA 00000148 R		mov		edx, OFFSET negativeNumPrompt
- 00000041  E8 00000000 E		call	WriteString
- 00000046  E8 00000000 E		call	ReadInt
+ 0000002D  BA 000001D8 R		mov		edx, OFFSET numberString
+ 00000032  E8 00000000 E		call	WriteString
+ 00000037  A1 000001EB R		mov		eax, numEntries
+ 0000003C  E8 00000000 E		call	WriteDec
+ 00000041  BA 000001E0 R		mov		edx, OFFSET colon
+ 00000046  E8 00000000 E		call	WriteString
+ 0000004B  E8 00000000 E		call	ReadInt
 
 					; Checks the value of the input int
- 0000004B  A3 0000019E R		mov		inputValue, eax
- 00000050  83 3D 0000019E R		cmp		inputValue, 0		; non-negative has been entered
+ 00000050  A3 000001E3 R		mov		inputValue, eax
+ 00000055  83 3D 000001E3 R		cmp		inputValue, 0		; non-negative has been entered
 	   00
- 00000057  7D 31			jge		loopEnd
+ 0000005C  7D 31			jge		loopEnd
 
 					; Check if the value is within range
- 00000059  83 3D 0000019E R		cmp		inputValue, LOWER_LIMIT
+ 0000005E  83 3D 000001E3 R		cmp		inputValue, LOWER_LIMIT
 	   9C
- 00000060  73 02			jae		valueInRange
- 00000062  EB 15			jmp		belowNegative100
+ 00000065  73 02			jae		valueInRange
+ 00000067  EB 15			jmp		belowNegative100
 
 					; The value is within range and it is added to the sum
- 00000064			valueInRange:
- 00000064  A1 0000019E R		mov		eax, inputValue
- 00000069  F7 D8			neg		eax
- 0000006B  01 05 000001A2 R		add		negativeSum, eax
- 00000071  FF 05 000001AA R		inc		numEntries
- 00000077  EB C3			jmp		negNumLoop
+ 00000069			valueInRange:
+ 00000069  A1 000001E3 R		mov		eax, inputValue
+ 0000006E  F7 D8			neg		eax
+ 00000070  01 05 000001E7 R		add		negativeSum, eax
+ 00000076  FF 05 000001EB R		inc		numEntries
+ 0000007C  EB AF			jmp		negNumLoop
 
 					; The value is below -100
- 00000079			belowNegative100:
- 00000079  BA 00000189 R		mov		edx, OFFSET belowNeg100Warn
- 0000007E  E8 00000000 E		call	WriteString
- 00000083  E8 00000000 E		call	Crlf
- 00000088  EB B2			jmp		negNumLoop
+ 0000007E			belowNegative100:
+ 0000007E  BA 000001C3 R		mov		edx, OFFSET belowNeg100Warn
+ 00000083  E8 00000000 E		call	WriteString
+ 00000088  E8 00000000 E		call	Crlf
+ 0000008D  EB 9E			jmp		negNumLoop
 
- 0000008A			loopEnd:
+ 0000008F			loopEnd:
 
 				; Display sum and average
+ 0000008F  83 3D 000001EB R		cmp		numEntries, 1
+	   01
+ 00000096  74 30			je		noEntries
+					; if 1 or more entry
+ 00000098  BA 00000207 R		mov		edx, OFFSET output1
+ 0000009D  E8 00000000 E		call	WriteString
+ 000000A2  A1 000001EB R		mov		eax, numEntries
+ 000000A7  48				dec		eax
+ 000000A8  E8 00000000 E		call	WriteDec
+ 000000AD  BA 00000214 R		mov		edx, OFFSET output2
+ 000000B2  E8 00000000 E		call	WriteString
+ 000000B7  E8 00000000 E		call	Crlf
+
 					; Sum
- 0000008A  BA 000001AE R		mov		edx, OFFSET sum
- 0000008F  E8 00000000 E		call	WriteString
- 00000094  BA 000001BE R		mov		edx, OFFSET negativeSign
- 00000099  E8 00000000 E		call	WriteString
- 0000009E  A1 000001A2 R		mov		eax, negativeSum
- 000000A3  E8 00000000 E		call	WriteDec
- 000000A8  E8 00000000 E		call	Crlf
+ 000000BC  E8 000000AF			call	displaySum
 
 					; Average
- 000000AD  BA 000001B4 R		mov		edx, OFFSET average
- 000000B2  E8 00000000 E		call	WriteString
- 000000B7  BA 000001BE R		mov		edx, OFFSET negativeSign
- 000000BC  E8 00000000 E		call	WriteString
- 000000C1  8B 1D 000001AA R		mov		ebx, numEntries
- 000000C7  33 D2			xor		edx, edx
- 000000C9  F7 F3			div		ebx
- 000000CB  A3 000001A6 R		mov		negativeAverage, eax
- 000000D0  E8 00000000 E		call	WriteDec
- 000000D5  E8 00000000 E		call	Crlf
+ 000000C1  E8 000000D2			call	displayAverage
+ 000000C6  EB 0F			jmp		endProgram
 
+ 000000C8			noEntries:
+ 000000C8  BA 000001EF R		mov		edx, OFFSET output0
+ 000000CD  E8 00000000 E		call	WriteString
+ 000000D2  E8 00000000 E		call	Crlf
 
+ 000000D7			endProgram:
+ 000000D7  E8 000000F6			call	displayGoodbye
 
-					exit	; exit to operating system
- 000000DA  6A 00	   *	    push   +000000000h
- 000000DC  E8 00000000 E   *	    call   ExitProcess
- 000000E1			main ENDP
+					exit	; exits to operating system
+ 000000DC  6A 00	   *	    push   +000000000h
+ 000000DE  E8 00000000 E   *	    call   ExitProcess
+ 000000E3			main ENDP
+
 
 				;-------------------------------------
 				; Procedure to introduce the programmer
@@ -229,18 +274,18 @@ Microsoft (R) Macro Assembler Version 14.10.25019.0	    10/24/17 14:30:16
 				; preconditions: none
 				; registers changed: edx
 				;-------------------------------------
- 000000E1			introduceProgrammer PROC USES edx
- 000000E1  52		   *	    push   edx
- 000000E2  BA 00000000 R		mov		edx, OFFSET programTitle
- 000000E7  E8 00000000 E		call	WriteString
- 000000EC  E8 00000000 E		call	Crlf
- 000000F1  BA 00000021 R		mov		edx, OFFSET programmerName
- 000000F6  E8 00000000 E		call	WriteString
- 000000FB  E8 00000000 E		call	Crlf
+ 000000E3			introduceProgrammer PROC USES edx
+ 000000E3  52		   *	    push   edx
+ 000000E4  BA 00000000 R		mov		edx, OFFSET programTitle
+ 000000E9  E8 00000000 E		call	WriteString
+ 000000EE  E8 00000000 E		call	Crlf
+ 000000F3  BA 00000021 R		mov		edx, OFFSET programmerName
+ 000000F8  E8 00000000 E		call	WriteString
+ 000000FD  E8 00000000 E		call	Crlf
 					ret
- 00000100  5A		   *	    pop    edx
- 00000101  C3		   *	    ret    00000h
- 00000102			introduceProgrammer ENDP
+ 00000102  5A		   *	    pop    edx
+ 00000103  C3		   *	    ret    00000h
+ 00000104			introduceProgrammer ENDP
 
 				;-------------------------------------
 				; Procedure to get the users name
@@ -249,26 +294,139 @@ Microsoft (R) Macro Assembler Version 14.10.25019.0	    10/24/17 14:30:16
 				; preconditions: none
 				; registers changed: eax, ecx, edx
 				;-------------------------------------
- 00000102			getName PROC USES eax ecx edx
- 00000102  50		   *	    push   eax
- 00000103  51		   *	    push   ecx
- 00000104  52		   *	    push   edx
- 00000105  BA 00000036 R		mov		edx, OFFSET namePrompt
- 0000010A  E8 00000000 E		call	WriteString
- 0000010F  BA 00000049 R		mov		edx, OFFSET userName
- 00000114  B9 00000015			mov		ecx, SIZEOF	userName
- 00000119  E8 00000000 E		call	ReadString
- 0000011E  A3 0000005E R		mov		userNameSize, eax
+ 00000104			getName PROC USES eax ecx edx
+ 00000104  50		   *	    push   eax
+ 00000105  51		   *	    push   ecx
+ 00000106  52		   *	    push   edx
+ 00000107  BA 00000069 R		mov		edx, OFFSET namePrompt
+ 0000010C  E8 00000000 E		call	WriteString
+ 00000111  BA 0000007C R		mov		edx, OFFSET userName
+ 00000116  B9 00000015			mov		ecx, SIZEOF	userName
+ 0000011B  E8 00000000 E		call	ReadString
+ 00000120  A3 00000091 R		mov		userNameSize, eax
+ 00000125  E8 00000000 E		call	Crlf
 					ret
- 00000123  5A		   *	    pop    edx
- 00000124  59		   *	    pop    ecx
- 00000125  58		   *	    pop    eax
- 00000126  C3		   *	    ret    00000h
- 00000127			getName ENDP
+ 0000012A  5A		   *	    pop    edx
+ 0000012B  59		   *	    pop    ecx
+ 0000012C  58		   *	    pop    eax
+ 0000012D  C3		   *	    ret    00000h
+ 0000012E			getName ENDP
 
+				;-------------------------------------
+				; Procedure to greet the user
+				; recieves: none
+				; returns: none
+				; preconditions: none
+				; registers changed: edx
+				;-------------------------------------
+ 0000012E			greetUser PROC USES edx
+ 0000012E  52		   *	    push   edx
+ 0000012F  BA 00000095 R		mov		edx, OFFSET greeting
+ 00000134  E8 00000000 E		call	WriteString
+ 00000139  BA 0000007C R		mov		edx, OFFSET userName
+ 0000013E  E8 00000000 E		call	WriteString
+ 00000143  E8 00000000 E		call	Crlf
+ 00000148  E8 00000000 E		call	Crlf
+					ret
+ 0000014D  5A		   *	    pop    edx
+ 0000014E  C3		   *	    ret    00000h
+ 0000014F			greetUser ENDP
+
+				;-------------------------------------
+				; Procedure to instruct the user on how to proceed
+				; recieves: none
+				; returns: none
+				; preconditions: none
+				; registers changed: edx
+				;-------------------------------------
+ 0000014F			instructUser PROC USES edx
+ 0000014F  52		   *	    push   edx
+ 00000150  BA 0000009D R		mov		edx, OFFSET instruction
+ 00000155  E8 00000000 E		call	WriteString
+ 0000015A  E8 00000000 E		call	Crlf
+ 0000015F  BA 0000017B R		mov		edx, OFFSET negativeNumPrompt
+ 00000164  E8 00000000 E		call	WriteString
+ 00000169  E8 00000000 E		call	Crlf
+					ret
+ 0000016E  5A		   *	    pop    edx
+ 0000016F  C3		   *	    ret    00000h
+ 00000170			instructUser ENDP
+
+				;-------------------------------------
+				; Procedure to display sum
+				; recieves: none
+				; returns: none
+				; preconditions: none
+				; registers changed: eax edx
+				;-------------------------------------
+ 00000170			displaySum PROC USES eax edx
+ 00000170  50		   *	    push   eax
+ 00000171  52		   *	    push   edx
+ 00000172  BA 0000021E R		mov		edx, OFFSET sum
+ 00000177  E8 00000000 E		call	WriteString
+ 0000017C  BA 0000022E R		mov		edx, OFFSET negativeSign
+ 00000181  E8 00000000 E		call	WriteString
+ 00000186  A1 000001E7 R		mov		eax, negativeSum
+ 0000018B  E8 00000000 E		call	WriteDec
+ 00000190  E8 00000000 E		call	Crlf
+					ret
+ 00000195  5A		   *	    pop    edx
+ 00000196  58		   *	    pop    eax
+ 00000197  C3		   *	    ret    00000h
+ 00000198			displaySum ENDP
+
+				;-------------------------------------
+				; Procedure to display average
+				; recieves: none
+				; returns: none
+				; preconditions: none
+				; registers changed: eax, ebx, edx
+				;-------------------------------------
+ 00000198			displayAverage PROC USES eax ebx edx 
+ 00000198  50		   *	    push   eax
+ 00000199  53		   *	    push   ebx
+ 0000019A  52		   *	    push   edx
+ 0000019B  BA 00000224 R		mov		edx, OFFSET average
+ 000001A0  E8 00000000 E		call	WriteString
+ 000001A5  BA 0000022E R		mov		edx, OFFSET negativeSign
+ 000001AA  E8 00000000 E		call	WriteString
+ 000001AF  FF 0D 000001EB R		dec		numEntries
+ 000001B5  8B 1D 000001EB R		mov		ebx, numEntries
+ 000001BB  33 D2			xor		edx, edx
+ 000001BD  A1 000001E7 R		mov		eax, negativeSum
+ 000001C2  F7 F3			div		ebx
+ 000001C4  E8 00000000 E		call	WriteDec
+ 000001C9  E8 00000000 E		call	Crlf
+					ret
+ 000001CE  5A		   *	    pop    edx
+ 000001CF  5B		   *	    pop    ebx
+ 000001D0  58		   *	    pop    eax
+ 000001D1  C3		   *	    ret    00000h
+ 000001D2			displayAverage ENDP
+
+				;-------------------------------------
+				; Procedure to display goodbye Message
+				; recieves: none
+				; returns: none
+				; preconditions: there is a userName variable
+				; registers changed: edx
+				;-------------------------------------
+ 000001D2			displayGoodbye PROC USES edx
+ 000001D2  52		   *	    push   edx
+ 000001D3  BA 00000230 R		mov		edx, OFFSET thanksMessage
+ 000001D8  E8 00000000 E		call	WriteString
+ 000001DD  BA 0000007C R		mov		edx, OFFSET userName
+ 000001E2  E8 00000000 E		call	WriteString
+ 000001E7  BA 00000250 R		mov		edx, OFFSET goodbye
+ 000001EC  E8 00000000 E		call	WriteString
+ 000001F1  E8 00000000 E		call	Crlf
+					ret
+ 000001F6  5A		   *	    pop    edx
+ 000001F7  C3		   *	    ret    00000h
+ 000001F8			displayGoodbye ENDP
 
 				END main
-Microsoft (R) Macro Assembler Version 14.10.25019.0	    10/24/17 14:30:16
+Microsoft (R) Macro Assembler Version 14.10.25019.0	    10/24/17 16:58:59
 4Sum of Negative Numbers     (EmmetCookeProgram3.asm	     Symbols 2 - 1
 
 
@@ -362,8 +520,8 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 000001C0 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 00000127 Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 0000025B Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 000001F8 Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
@@ -470,13 +628,20 @@ WriteStackFrame  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External
 WriteString  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteToFile  . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
 WriteWindowsMsg  . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External STDCALL
-getName  . . . . . . . . . . . .	P Near	 00000102 _TEXT	Length= 00000025 Public STDCALL
-introduceProgrammer  . . . . . .	P Near	 000000E1 _TEXT	Length= 00000021 Public STDCALL
-main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 000000E1 Public STDCALL
-  negNumLoop . . . . . . . . . .	L Near	 0000003C _TEXT	
-  valueInRange . . . . . . . . .	L Near	 00000064 _TEXT	
-  belowNegative100 . . . . . . .	L Near	 00000079 _TEXT	
-  loopEnd  . . . . . . . . . . .	L Near	 0000008A _TEXT	
+displayAverage . . . . . . . . .	P Near	 00000198 _TEXT	Length= 0000003A Public STDCALL
+displayGoodbye . . . . . . . . .	P Near	 000001D2 _TEXT	Length= 00000026 Public STDCALL
+displaySum . . . . . . . . . . .	P Near	 00000170 _TEXT	Length= 00000028 Public STDCALL
+getName  . . . . . . . . . . . .	P Near	 00000104 _TEXT	Length= 0000002A Public STDCALL
+greetUser  . . . . . . . . . . .	P Near	 0000012E _TEXT	Length= 00000021 Public STDCALL
+instructUser . . . . . . . . . .	P Near	 0000014F _TEXT	Length= 00000021 Public STDCALL
+introduceProgrammer  . . . . . .	P Near	 000000E3 _TEXT	Length= 00000021 Public STDCALL
+main . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 000000E3 Public STDCALL
+  negNumLoop . . . . . . . . . .	L Near	 0000002D _TEXT	
+  valueInRange . . . . . . . . .	L Near	 00000069 _TEXT	
+  belowNegative100 . . . . . . .	L Near	 0000007E _TEXT	
+  loopEnd  . . . . . . . . . . .	L Near	 0000008F _TEXT	
+  noEntries  . . . . . . . . . .	L Near	 000000C8 _TEXT	
+  endProgram . . . . . . . . . .	L Near	 000000D7 _TEXT	
 printf . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 scanf  . . . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
 wsprintfA  . . . . . . . . . . .	P Near	 00000000 FLAT	Length= 00000000 External C
@@ -696,18 +861,21 @@ VK_UP  . . . . . . . . . . . . .	Number	 00000026h
 WINDOW_BUFFER_SIZE_EVENT . . . .	Number	 00000004h   
 WriteConsoleOutputCharacter  . .	Text   	 WriteConsoleOutputCharacterA
 WriteConsole . . . . . . . . . .	Text   	 WriteConsoleA
-average  . . . . . . . . . . . .	Byte	 000001B4 _DATA	
-belowNeg100Warn  . . . . . . . .	Byte	 00000189 _DATA	
+average  . . . . . . . . . . . .	Byte	 00000224 _DATA	
+belowNeg100Warn  . . . . . . . .	Byte	 000001C3 _DATA	
 black  . . . . . . . . . . . . .	Number	 00000000h   
 blue . . . . . . . . . . . . . .	Number	 00000001h   
 brown  . . . . . . . . . . . . .	Number	 00000006h   
+colon  . . . . . . . . . . . . .	Byte	 000001E0 _DATA	
 cyan . . . . . . . . . . . . . .	Number	 00000003h   
 exit . . . . . . . . . . . . . .	Text   	 INVOKE ExitProcess,0
+extraCredit1 . . . . . . . . . .	Byte	 00000036 _DATA	
+goodbye  . . . . . . . . . . . .	Byte	 00000250 _DATA	
 gray . . . . . . . . . . . . . .	Number	 00000008h   
 green  . . . . . . . . . . . . .	Number	 00000002h   
-greeting . . . . . . . . . . . .	Byte	 00000062 _DATA	
-inputValue . . . . . . . . . . .	DWord	 0000019E _DATA	
-instruction  . . . . . . . . . .	Byte	 0000006A _DATA	
+greeting . . . . . . . . . . . .	Byte	 00000095 _DATA	
+inputValue . . . . . . . . . . .	DWord	 000001E3 _DATA	
+instruction  . . . . . . . . . .	Byte	 0000009D _DATA	
 lightBlue  . . . . . . . . . . .	Number	 00000009h   
 lightCyan  . . . . . . . . . . .	Number	 0000000Bh   
 lightGray  . . . . . . . . . . .	Number	 00000007h   
@@ -715,18 +883,22 @@ lightGreen . . . . . . . . . . .	Number	 0000000Ah
 lightMagenta . . . . . . . . . .	Number	 0000000Dh   
 lightRed . . . . . . . . . . . .	Number	 0000000Ch   
 magenta  . . . . . . . . . . . .	Number	 00000005h   
-namePrompt . . . . . . . . . . .	Byte	 00000036 _DATA	
-negativeAverage  . . . . . . . .	DWord	 000001A6 _DATA	
-negativeNumPrompt  . . . . . . .	Byte	 00000148 _DATA	
-negativeSign . . . . . . . . . .	Byte	 000001BE _DATA	
-negativeSum  . . . . . . . . . .	DWord	 000001A2 _DATA	
-numEntries . . . . . . . . . . .	DWord	 000001AA _DATA	
+namePrompt . . . . . . . . . . .	Byte	 00000069 _DATA	
+negativeNumPrompt  . . . . . . .	Byte	 0000017B _DATA	
+negativeSign . . . . . . . . . .	Byte	 0000022E _DATA	
+negativeSum  . . . . . . . . . .	DWord	 000001E7 _DATA	
+numEntries . . . . . . . . . . .	DWord	 000001EB _DATA	
+numberString . . . . . . . . . .	Byte	 000001D8 _DATA	
+output0  . . . . . . . . . . . .	Byte	 000001EF _DATA	
+output1  . . . . . . . . . . . .	Byte	 00000207 _DATA	
+output2  . . . . . . . . . . . .	Byte	 00000214 _DATA	
 programTitle . . . . . . . . . .	Byte	 00000000 _DATA	
 programmerName . . . . . . . . .	Byte	 00000021 _DATA	
 red  . . . . . . . . . . . . . .	Number	 00000004h   
-sum  . . . . . . . . . . . . . .	Byte	 000001AE _DATA	
-userNameSize . . . . . . . . . .	DWord	 0000005E _DATA	
-userName . . . . . . . . . . . .	Byte	 00000049 _DATA	
+sum  . . . . . . . . . . . . . .	Byte	 0000021E _DATA	
+thanksMessage  . . . . . . . . .	Byte	 00000230 _DATA	
+userNameSize . . . . . . . . . .	DWord	 00000091 _DATA	
+userName . . . . . . . . . . . .	Byte	 0000007C _DATA	
 white  . . . . . . . . . . . . .	Number	 0000000Fh   
 wsprintf . . . . . . . . . . . .	Text   	 wsprintfA
 yellow . . . . . . . . . . . . .	Number	 0000000Eh   

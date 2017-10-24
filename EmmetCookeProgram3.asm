@@ -5,6 +5,7 @@ TITLE Sum of Negative Numbers     (EmmetCookeProgram3.asm)
 ; Description: This program asks the users for a series of negative numbers between
 ; -100 and -1. It will continue to prompt them for numbers until they enter a non-negative
 ; number. Then it will display the sum and average of the entered numbers.
+; EC #1: This program displays a number as the user enters them
 
 INCLUDE Irvine32.inc
 
@@ -15,6 +16,7 @@ LOWER_LIMIT = -100
 	; Strings to display the programmers name and the program title
 	programTitle		BYTE	"Program: Sum of Negative Numbers",0
 	programmerName		BYTE	"Author : Emmet Cooke",0
+	extraCredit1		BYTE	"EC#1: This program numbers the lines during input.",0
 
 	; Variables to get the users name, store the input, and greet them
 	namePrompt			BYTE	"What's your name? ",0
@@ -27,44 +29,53 @@ LOWER_LIMIT = -100
 						BYTE	"It will continue to ask you to enter a number in this range",0ah
 						BYTE	"until a non-negative number is entered.", 0ah
 						BYTE	"Then, it will output the sum and average of those values.",0
-	negativeNumPrompt	BYTE	"Please enter a number between -100 and -1 (0 or above to quit): ",0
+	negativeNumPrompt	BYTE	"Please enter a number between -100 and -1. Enter 0 or greater to quit. ",0
 	belowNeg100Warn		BYTE	"That is below -100. ",0
+	numberString		BYTE	"Number ",0
+	colon				BYTE	": ",0
 
 	; Variables to hold the values input by the user
 	inputValue			DWORD	?
 	negativeSum			DWORD	0
-	negativeAverage		DWORD	0
-	numEntries			DWORD	0
+	numEntries			DWORD	1
 
 	; Strings to display the results
+	output0				BYTE	"You entered no numbers.",0
+	output1				BYTE	"You entered ",0
+	output2				BYTE	" numbers.",0
 	sum					BYTE	"Sum: ",0
 	average				BYTE	"Average: ",0
 	negativeSign		BYTE	"-",0
 
+	; Goodbye message
+	thanksMessage		BYTE	"Thanks for using this program, ",0
+	goodbye				BYTE	". Goodbye!",0
+
 .code
 main PROC
 	; Introduce the Programmer
-	call	introduceProgrammer	; Goes to the introduceProgrammer procedure
+	call	introduceProgrammer	
+	mov		edx, OFFSET extraCredit1
+	call	WriteString
+	call	Crlf
+	call	Crlf
 
 	; Gets the users name and greets them
-	call	getName				; Goes to the getName procedure
-	call	Crlf
-	mov		edx, OFFSET greeting
-	call	WriteString
-	mov		edx, OFFSET userName
-	call	WriteString
-	call	Crlf
-	call	Crlf
+	call	getName				
+	call	greetUser			
 
 	; Instruct the user on how to use the program
-	mov		edx, OFFSET instruction
-	call	WriteString
+	call	instructUser
 	call	Crlf
 
 	; Get a number between -100 and -1 from the user
 negNumLoop:
 	; Prompts the user for a value
-	mov		edx, OFFSET negativeNumPrompt
+	mov		edx, OFFSET numberString
+	call	WriteString
+	mov		eax, numEntries
+	call	WriteDec
+	mov		edx, OFFSET colon
 	call	WriteString
 	call	ReadInt
 
@@ -96,31 +107,36 @@ belowNegative100:
 loopEnd:
 
 ; Display sum and average
-	; Sum
-	mov		edx, OFFSET sum
+	cmp		numEntries, 1
+	je		noEntries
+	; if 1 or more entry
+	mov		edx, OFFSET output1
 	call	WriteString
-	mov		edx, OFFSET negativeSign
-	call	WriteString
-	mov		eax, negativeSum
+	mov		eax, numEntries
+	dec		eax
 	call	WriteDec
+	mov		edx, OFFSET output2
+	call	WriteString
 	call	Crlf
+
+	; Sum
+	call	displaySum
 
 	; Average
-	mov		edx, OFFSET average
+	call	displayAverage
+	jmp		endProgram
+
+noEntries:
+	mov		edx, OFFSET output0
 	call	WriteString
-	mov		edx, OFFSET negativeSign
-	call	WriteString
-	mov		ebx, numEntries
-	xor		edx, edx
-	div		ebx
-	mov		negativeAverage, eax
-	call	WriteDec
 	call	Crlf
 
+endProgram:
+	call	displayGoodbye
 
-
-	exit	; exit to operating system
+	exit	; exits to operating system
 main ENDP
+
 
 ;-------------------------------------
 ; Procedure to introduce the programmer
@@ -153,8 +169,100 @@ getName PROC USES eax ecx edx
 	mov		ecx, SIZEOF	userName
 	call	ReadString
 	mov		userNameSize, eax
+	call	Crlf
 	ret
 getName ENDP
 
+;-------------------------------------
+; Procedure to greet the user
+; recieves: none
+; returns: none
+; preconditions: none
+; registers changed: edx
+;-------------------------------------
+greetUser PROC USES edx
+	mov		edx, OFFSET greeting
+	call	WriteString
+	mov		edx, OFFSET userName
+	call	WriteString
+	call	Crlf
+	call	Crlf
+	ret
+greetUser ENDP
+
+;-------------------------------------
+; Procedure to instruct the user on how to proceed
+; recieves: none
+; returns: none
+; preconditions: none
+; registers changed: edx
+;-------------------------------------
+instructUser PROC USES edx
+	mov		edx, OFFSET instruction
+	call	WriteString
+	call	Crlf
+	mov		edx, OFFSET negativeNumPrompt
+	call	WriteString
+	call	Crlf
+	ret
+instructUser ENDP
+
+;-------------------------------------
+; Procedure to display sum
+; recieves: none
+; returns: none
+; preconditions: none
+; registers changed: eax edx
+;-------------------------------------
+displaySum PROC USES eax edx
+	mov		edx, OFFSET sum
+	call	WriteString
+	mov		edx, OFFSET negativeSign
+	call	WriteString
+	mov		eax, negativeSum
+	call	WriteDec
+	call	Crlf
+	ret
+displaySum ENDP
+
+;-------------------------------------
+; Procedure to display average
+; recieves: none
+; returns: none
+; preconditions: none
+; registers changed: eax, ebx, edx
+;-------------------------------------
+displayAverage PROC USES eax ebx edx 
+	mov		edx, OFFSET average
+	call	WriteString
+	mov		edx, OFFSET negativeSign
+	call	WriteString
+	dec		numEntries
+	mov		ebx, numEntries
+	xor		edx, edx
+	mov		eax, negativeSum
+	div		ebx
+	call	WriteDec
+	call	Crlf
+	ret
+displayAverage ENDP
+
+;-------------------------------------
+; Procedure to display goodbye Message
+; recieves: none
+; returns: none
+; preconditions: there is a userName variable
+; registers changed: edx
+;-------------------------------------
+displayGoodbye PROC USES edx
+	mov		edx, OFFSET thanksMessage
+	call	WriteString
+	mov		edx, OFFSET userName
+	call	WriteString
+	mov		edx, OFFSET goodbye
+	call	WriteString
+	call	Crlf
+	ret
+displayGoodbye ENDP
 
 END main

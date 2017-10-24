@@ -8,7 +8,8 @@ TITLE Sum of Negative Numbers     (EmmetCookeProgram3.asm)
 
 INCLUDE Irvine32.inc
 
-; (insert constant definitions here)
+; Constant Definitions
+LOWER_LIMIT = -100
 
 .data
 	; Strings to display the programmers name and the program title
@@ -32,7 +33,13 @@ INCLUDE Irvine32.inc
 	; Variables to hold the values input by the user
 	inputValue			DWORD	?
 	negativeSum			DWORD	0
-	negativeAverage		DWORD	?
+	negativeAverage		DWORD	0
+	numEntries			DWORD	0
+
+	; Strings to display the results
+	sum					BYTE	"Sum: ",0
+	average				BYTE	"Average: ",0
+	negativeSign		BYTE	"-",0
 
 .code
 main PROC
@@ -46,6 +53,7 @@ main PROC
 	call	WriteString
 	mov		edx, OFFSET userName
 	call	WriteString
+	call	Crlf
 	call	Crlf
 
 	; Instruct the user on how to use the program
@@ -66,14 +74,16 @@ negNumLoop:
 	jge		loopEnd
 
 	; Check if the value is within range
-	cmp		inputValue, -100
+	cmp		inputValue, LOWER_LIMIT
 	jae		valueInRange
 	jmp		belowNegative100
 
 	; The value is within range and it is added to the sum
 valueInRange:
 	mov		eax, inputValue
+	neg		eax
 	add		negativeSum, eax
+	inc		numEntries
 	jmp		negNumLoop
 
 	; The value is below -100
@@ -84,6 +94,31 @@ belowNegative100:
 	jmp		negNumLoop
 
 loopEnd:
+
+; Display sum and average
+	; Sum
+	mov		edx, OFFSET sum
+	call	WriteString
+	mov		edx, OFFSET negativeSign
+	call	WriteString
+	mov		eax, negativeSum
+	call	WriteDec
+	call	Crlf
+
+	; Average
+	mov		edx, OFFSET average
+	call	WriteString
+	mov		edx, OFFSET negativeSign
+	call	WriteString
+	mov		ebx, numEntries
+	xor		edx, edx
+	div		ebx
+	mov		negativeAverage, eax
+	call	WriteDec
+	call	Crlf
+
+
+
 	exit	; exit to operating system
 main ENDP
 
